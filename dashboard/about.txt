@@ -1,0 +1,58 @@
+TOKEN RADAR — the fitted launch board (token-radar-02)
+========================================================================
+
+What this is: a ranking of every protocol in the sealed DefiLlama
+snapshot of 2026-11-14 that still records no token, priced by
+what its launch would be worth under a value model fitted on the
+protocols that already trade — plus a farm plan for each, priced in
+dollars. This file is generated from board.json by
+tools/build-about.mjs; the dashboard renders the same numbers from
+data.js, and re-prices every row in the browser to prove they agree.
+
+THE UNIVERSE, RECONCILED
+  758 protocols = 127 trading anchors + 197 ranked + 434 set aside
+    set aside — token_no_mcap: 288
+    set aside — staked_product: 49
+    set aside — bridge_product: 43
+    set aside — cex_exchange: 42
+    set aside — versioned: 11
+    set aside — duplicate_ticker: 1
+  118 anchors carry the fit; 9 exchange tokens are
+  counted as trading but kept out of it (a cap prices the exchange's
+  business, not a protocol's TVL). No wrapped, staked or bridged
+  product of a trading token is ranked.
+
+THE VALUE MODEL (fitted, not declared)
+  log10(implied value) = 3.349662 + 0.480119 * log10(TVL) + categoryOffset + clamp(-0.002918 * change_7d_pct, log10(0.75), log10(1.25)) + -0.039315 * log10(1 + days_without_token / 30)
+  fitted on: trading anchors (a recorded market cap, one per ticker); Huber IRLS log-log fit, category offsets shrunk with k = 16, growth carry and seasoning fitted through the origin on the residuals in that order
+  coefficients: intercept 3.349662, slope 0.480119, growth carry -0.002918 per +1% of 7d change (clamped to a
+  0.75x–1.25x multiplier), seasoning -0.039315 per log10(1 + days/30);
+  category offsets shrunk with k = 16 across 33 categories; residual MAD 0.51436 log10; 200 bootstrap refits give each
+  row its P25–P75 value band and rank range.
+
+OUT-OF-SAMPLE VALIDATION (leave-one-out on the 118 fit anchors)
+  full model:    median miss 3.472x, within 3x 46.6%, within 10x 78%
+  flat multiple: median miss 4.941x (0.2488x TVL), within 3x 33.9%, within 10x 75.4%
+  walk-forward:  median miss 2.62x (train 43 oldest anchors, test 44 newest)
+  ablation (median miss / within 3x):
+    baseline — size curve only: 3.398x / 43.2%
+    + category offsets: 3.633x / 46.6%
+    + growth carry: 3.626x / 45.8%
+    + seasoning (the board's model): 3.472x / 46.6%
+
+FARM ECONOMICS (one arithmetic for every row)
+  gross slice = 5% x implied value x share of TVL, with share of TVL = deposit / (TVL + deposit)
+  costs = fees (0.5% of deposit) + gas (table) + opportunity cost (4% a year x deposit x 70/365)
+  net if launch = gross slice - costs; net per hour = net if launch / 3 hands-on hours
+  break-even = costs / gross slice — the launch chance at which the plan's expected value is zero
+  assumptions: allocation 5% of implied value, fees 0.5% of deposit, T-bill 4% a year, hold 10 weeks, 3 hands-on hours, gas per the board's 53-chain table (default $5).
+  verdicts, applied in this order — Thin, then Skip, then Farm, else Marginal:
+    Farm: net if launch >= $100, net per hour >= $15 and break-even probability <= 35%
+    Marginal: net if launch is positive but under the Farm bar
+    Thin: gross slice under $25 — the reward itself is too thin at this deposit, whatever the costs
+    Skip: net if launch <= 0 — the costs eat the whole slice even if the protocol does launch
+
+Files: index.html (the page), app.css, app.js (all rendering and the
+in-page re-pricing), data-anchors.js (the trading anchors, rebuilt
+from the snapshot and verified against this board), data.js (the
+board itself, written by main.ts beside the page).

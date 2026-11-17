@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Radar — the fitted launch board</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="site">
+  <div class="site-in">
+    <div>
+      <h1>Token Radar <span class="tag">fitted launch board</span></h1>
+      <p class="sub" id="subline">Ranking every protocol that still has no token by what its launch would be worth — priced by a model fitted on the protocols that already trade, never by hand.</p>
+    </div>
+    <div class="asof" id="asof"></div>
+  </div>
+</header>
+<main>
+  <section id="stats" class="stats" aria-label="Board statistics"></section>
+  <p id="verify" class="verify" aria-label="Self verification"></p>
+  <section id="boardview">
+    <div id="controls" class="controls"></div>
+    <p id="rowcount" class="rowcount"></p>
+    <div class="tablewrap">
+      <table id="board" class="board">
+        <thead id="boardhead"></thead>
+        <tbody id="boardbody"></tbody>
+        <tbody id="anchorbody"></tbody>
+      </table>
+    </div>
+  </section>
+  <section id="detail" class="detail" hidden></section>
+  <section id="method" class="method" aria-label="Method and validation"></section>
+  <footer class="foot" id="foot"></footer>
+</main>
+<script src="data.js"></script>
+<script src="data-anchors.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
